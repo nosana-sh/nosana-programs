@@ -1,25 +1,17 @@
-# .nosana-ci.yml
-nosana:
-    description: Build and Test Nosana Contracts
-    backend: IPFS
-
 global:
-    image: registry.hub.docker.com/projectserum/build:v0.25.0
+    image: nosana/solana
 
     # Trigger pipeline on these branches:
     trigger:
         branch:
-            - main
-
+            - "*"
 jobs:
-
     - name: install
       commands:
         - npm ci
 
       artifacts:
         - name: node_modules
-          path: ./node_modules/
 
     - name: npm lint
       commands:
@@ -33,8 +25,7 @@ jobs:
       commands:
         - anchor build
       artifacts:
-        - name: anchor_target
-          path: ./target/
+        - name: target
 
     - name: anchor test
       commands:
@@ -42,7 +33,7 @@ jobs:
           - anchor test --skip-build
       resources:
         - node_modules
-        - anchor_target
+        - target
 
     - name: rust lint
       commands:
@@ -50,4 +41,4 @@ jobs:
           - cargo test --release
           - cargo clippy --release
       resources:
-          - anchor_target
+          - target
